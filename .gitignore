@@ -6,5 +6,10 @@ dist/
 .DS_Store
 npm-debug.log*
 yarn-error.log*
+# raw reference material — never commit
 assets/
-*.jpeg
+
+# don't commit stray jpegs at the root, but DO commit the processed images
+# that ship with the site (public/images) so Vercel has them at deploy time.
+/*.jpeg
+!/public/images/**
