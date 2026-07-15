@@ -1,0 +1,121 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'A new waterfront chapter — coming soon',
+  description = 'Imagine a place where the water meets the magic. A new waterfront community rising next to the world\'s most iconic playground. Register your interest.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0F1F2E" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0F1F2E" media="(prefers-color-scheme: dark)" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="color-scheme" content="light" />
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class="stack">
+      <slot />
+    </main>
+
+    <script>
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              io.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+      /* Posters animate independently — Ken Burns, underline draw, arrow reveal.
+         Observed with a lower threshold so the effect starts as soon as the poster
+         enters the viewport, especially important on mobile where posters are tall. */
+      const posterIo = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            entry.target.classList.toggle('is-visible', entry.isIntersecting);
+          }
+        },
+        { threshold: 0.15 }
+      );
+      document.querySelectorAll('.poster').forEach((el) => posterIo.observe(el));
+
+      /* Stack-deck scale-down: as the NEXT section slides up to cover the
+         current pinned card, the current card scales down and fades slightly —
+         reads as depth, like a card being buried in the deck. */
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!prefersReducedMotion) {
+        const stackSections = Array.from(
+          document.querySelectorAll<HTMLElement>('main.stack > section')
+        );
+        const MIN_SCALE   = 0.92;
+        const MIN_OPACITY = 0.55;
+
+        const updateStack = () => {
+          const vh = window.innerHeight;
+          for (let i = 0; i < stackSections.length; i++) {
+            const section = stackSections[i];
+            const next    = stackSections[i + 1];
+            if (!next) {
+              section.style.setProperty('--stack-scale', '1');
+              section.style.setProperty('--stack-opacity', '1');
+              continue;
+            }
+            const nextTop = next.getBoundingClientRect().top;
+            /* progress = 0 when next section is fully below viewport,
+               progress = 1 when next section has reached the top (current card fully covered). */
+            const raw = 1 - (nextTop / vh);
+            const progress = Math.max(0, Math.min(1, raw));
+            const scale   = 1 - progress * (1 - MIN_SCALE);
+            const opacity = 1 - progress * (1 - MIN_OPACITY);
+            section.style.setProperty('--stack-scale', scale.toFixed(4));
+            section.style.setProperty('--stack-opacity', opacity.toFixed(4));
+          }
+        };
+
+        let rafScheduled = false;
+        const onScroll = () => {
+          if (rafScheduled) return;
+          rafScheduled = true;
+          requestAnimationFrame(() => {
+            rafScheduled = false;
+            updateStack();
+          });
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+        updateStack();
+      }
+    </script>
+  </body>
+</html>

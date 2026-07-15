@@ -1,0 +1,477 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+    --ease-silk: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-gentle: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans;
+    font-feature-settings: 'ss01', 'ss02', 'cv11';
+    font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  img, svg, video {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::selection {
+    @apply bg-gold/40 text-midnight;
+  }
+
+  /* Tabular numerals for stats */
+  .tnum {
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply inline-flex items-center text-fluid-eyebrow uppercase tracking-eyebrow text-gold font-medium;
+  }
+
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.55;
+    margin-right: 0.75rem;
+  }
+
+  .eyebrow-plain {
+    @apply inline-block text-fluid-eyebrow uppercase tracking-eyebrow text-gold font-medium;
+  }
+
+  .display {
+    @apply font-sans font-light leading-display tracking-display;
+  }
+
+  .lede {
+    @apply text-fluid-lead leading-relaxed text-ink/70 font-light;
+  }
+
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-3 px-7 py-4
+           bg-midnight text-paper text-[11px] uppercase tracking-eyebrow2 font-medium
+           rounded-full transition-all duration-450 ease-silk
+           hover:bg-ink hover:shadow-xl hover:-translate-y-0.5
+           focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-paper;
+  }
+
+  .btn-primary .arrow {
+    display: inline-block;
+    transition: transform 450ms var(--ease-silk);
+  }
+
+  .btn-primary:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-3 text-[11px] uppercase tracking-eyebrow2 font-medium
+           text-midnight/70 hover:text-midnight transition-colors duration-450;
+  }
+
+  .btn-ghost::after {
+    content: '→';
+    display: inline-block;
+    transform: translateX(0);
+    transition: transform 450ms var(--ease-silk);
+  }
+
+  .btn-ghost:hover::after {
+    transform: translateX(4px);
+  }
+
+  .field {
+    @apply w-full bg-transparent border-b border-midnight/20 py-3 px-0
+           text-midnight placeholder:text-midnight/40 font-light
+           focus:outline-none focus:border-gold transition-colors duration-450;
+  }
+
+  .field-label {
+    @apply block text-[10px] uppercase tracking-eyebrow2 font-medium text-midnight/60 mb-2;
+  }
+
+  .hairline {
+    @apply block h-px w-full bg-current opacity-10;
+  }
+}
+
+@layer utilities {
+  /* ────────────── Sticky-card stack deck ──────────────
+     Every section pins to the top of the viewport as you scroll,
+     and the next section slides up over the previous one. As each
+     card gets buried under the next, JS applies a scale/opacity via
+     CSS vars (--stack-scale, --stack-opacity) so buried cards feel
+     receded behind the top of the deck. */
+  main.stack > section {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    z-index: 10;               /* stays above the footer while pinned */
+    transform-origin: center top;
+    transform: scale(var(--stack-scale, 1));
+    opacity: var(--stack-opacity, 1);
+    transition: transform 120ms linear, opacity 120ms linear;
+    will-change: transform, opacity;
+  }
+
+  /* Rounded top corners + top shadow so each stacking card reads as an
+     intentional deck layer. Skip the first (hero). */
+  main.stack > section:not(:first-child) {
+    border-top-left-radius: clamp(1rem, 2vw, 1.75rem);
+    border-top-right-radius: clamp(1rem, 2vw, 1.75rem);
+    box-shadow: 0 -18px 50px -20px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Footer sits below the deck — it only appears when the last card
+     (Register) has fully unpinned and scrolled away. */
+  main.stack > footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Small sections opt out of the stack — they flow normally between deck cards
+     as compact separators (e.g. the tag row). */
+  main.stack > section.no-stack {
+    position: relative;
+    min-height: 0;
+    transform: none;
+    opacity: 1;
+    box-shadow: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    transition: none;
+    will-change: auto;
+    z-index: 5;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    main.stack > section {
+      transition: none;
+    }
+  }
+
+  /* Grain overlay — pseudo-element sits behind children via z-index: -1
+     inside an isolated stacking context. Does NOT alter children's position. */
+  .grain-overlay {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .grain-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--grain);
+    background-size: 240px 240px;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+/* ─────────────── Reveal system ─────────────── */
+
+/* Reveal system — elements always visible. Kept as a no-op class so any
+   remaining markup that references it doesn't error. */
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─────────────── Marquee ─────────────── */
+
+.ticker {
+  display: flex;
+  overflow: hidden;
+  gap: 0;
+  --ticker-duration: 55s;
+}
+
+.ticker-track {
+  display: flex;
+  flex-shrink: 0;
+  min-width: 100%;
+  gap: 3rem;
+  padding-right: 3rem;
+  animation: ticker-scroll var(--ticker-duration) linear infinite;
+}
+
+@keyframes ticker-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-100%, 0, 0); }
+}
+
+/* ─────────────── MoodPoster interactions ─────────────── */
+
+.poster {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Static image on mobile (no Ken Burns, so scrims reliably hide burned-in text).
+   Desktop gets a subtle zoom on hover only. */
+.poster .poster-img {
+  transition: transform 1400ms var(--ease-silk);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .poster:hover .poster-img {
+    transform: scale(1.03);
+  }
+}
+
+/* Arrow is always subtly visible on touch, and animates in fully on hover. */
+.poster .poster-arrow {
+  opacity: 0.6;
+  transform: translate(0, 0);
+  transition: opacity 450ms var(--ease-silk), transform 450ms var(--ease-silk), border-color 450ms var(--ease-silk), background 450ms var(--ease-silk);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .poster .poster-arrow {
+    opacity: 0;
+    transform: translate(-8px, 8px);
+  }
+  .poster:hover .poster-arrow,
+  .poster:focus-within .poster-arrow {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+.poster:hover .poster-arrow {
+  background: rgb(147 180 206 / 0.95);
+  color: #0F1F2E;
+  border-color: transparent;
+}
+
+/* Underline draws in on scroll-in (touch) and further on hover (desktop). */
+.poster .poster-underline {
+  width: 0;
+  transition: width 900ms var(--ease-silk);
+}
+
+.poster.is-visible .poster-underline {
+  width: 1.75rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .poster:hover .poster-underline {
+    width: 3.25rem;
+  }
+}
+
+/* ─────────────── Sticky chapter counter ─────────────── */
+
+.chapter-counter {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 1.25rem);
+  right: 1.25rem;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid rgb(245 241 232 / 0.18);
+  background: rgb(15 31 46 / 0.55);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  border-radius: 999px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(245 241 232 / 0.85);
+  box-shadow: 0 6px 24px rgb(8 21 34 / 0.25);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 550ms var(--ease-silk), transform 550ms var(--ease-silk);
+  pointer-events: none;
+}
+
+.chapter-counter.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.chapter-counter .cc-num {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  font-feature-settings: 'tnum';
+  color: #93B4CE;
+  min-width: 1.35rem;
+  text-align: right;
+  letter-spacing: 0.16em;
+}
+
+.chapter-counter .cc-slash {
+  color: rgb(245 241 232 / 0.35);
+  padding: 0 0.15rem;
+}
+
+.chapter-counter .cc-total {
+  opacity: 0.55;
+  letter-spacing: 0.16em;
+}
+
+.chapter-counter .cc-divider {
+  display: inline-block;
+  width: 1rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.25;
+  margin: 0 0.5rem;
+}
+
+.chapter-counter .cc-label {
+  transition: opacity 350ms var(--ease-silk);
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* On mobile, drop the label; keep the compact 01 / 06 pill. */
+@media (max-width: 640px) {
+  .chapter-counter {
+    top: calc(env(safe-area-inset-top) + 0.9rem);
+    right: 0.9rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 9.5px;
+    gap: 0.4rem;
+  }
+  .chapter-counter .cc-divider,
+  .chapter-counter .cc-label {
+    display: none;
+  }
+  .chapter-counter .cc-num {
+    min-width: 1.2rem;
+  }
+}
+
+/* ─────────────── Sticky mobile CTA ─────────────── */
+
+.sticky-cta {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom) + 1rem);
+  right: 1rem;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1.35rem;
+  background: linear-gradient(135deg, #B6CDDE 0%, #93B4CE 100%);
+  color: #0F1F2E;
+  border: 1px solid rgb(245 241 232 / 0.35);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  box-shadow:
+    0 10px 30px rgb(8 21 34 / 0.35),
+    0 2px 8px rgb(8 21 34 / 0.25),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+  opacity: 0;
+  transform: translateY(20px) scale(0.96);
+  transition:
+    opacity 550ms var(--ease-silk),
+    transform 550ms var(--ease-silk),
+    background 300ms var(--ease-silk),
+    box-shadow 300ms var(--ease-silk);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.sticky-cta.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.sticky-cta .arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  background: rgb(15 31 46 / 0.15);
+  transition: transform 400ms var(--ease-silk), background 300ms var(--ease-silk);
+}
+
+.sticky-cta:hover, .sticky-cta:focus-visible {
+  background: linear-gradient(135deg, #F5F8FB 0%, #E8EEF4 100%);
+  box-shadow:
+    0 14px 40px rgb(8 21 34 / 0.45),
+    0 4px 12px rgb(8 21 34 / 0.3),
+    inset 0 1px 0 rgb(255 255 255 / 0.4);
+}
+
+.sticky-cta:hover .arrow, .sticky-cta:focus-visible .arrow {
+  transform: translateX(3px);
+  background: rgb(15 31 46 / 0.25);
+}
+
+@media (min-width: 768px) {
+  .sticky-cta {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 1.05rem 1.6rem;
+    font-size: 11px;
+  }
+  .sticky-cta .arrow {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+/* ─────────────── Section divider ─────────────── */
+
+.section-edge {
+  position: relative;
+}
+
+.section-edge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 40px;
+  width: 1px;
+  background: currentColor;
+  opacity: 0.2;
+}
+
+/* ─────────────── Reduced motion ─────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+  html { scroll-behavior: auto; }
+  .poster .poster-img { transition: none; }
+}

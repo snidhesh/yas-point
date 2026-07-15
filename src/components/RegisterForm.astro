@@ -1,0 +1,342 @@
+---
+/* Form submissions POST to /api/lead — a Vercel serverless function that
+   forwards to the BlackOak CRM intake endpoint. Requires CRM_TOKEN env var
+   on the server (set in Vercel dashboard for production). */
+const endpoint = '/api/lead';
+const unitTypes = ['Studio', '1 Bedroom', '2 Bedroom', '3 Bedroom', 'Not sure yet'];
+---
+<section id="register" class="relative bg-midnight text-paper !pt-0 pb-12 sm:pb-14 md:pb-16 lg:pb-20 overflow-hidden grain-overlay">
+  <div class="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] rounded-full bg-gold/5 blur-3xl"></div>
+
+  <div class="mx-auto max-w-4xl px-5 sm:px-6 md:px-10 relative">
+
+    <!-- ─── FORM VIEW ─── -->
+    <div id="form-view">
+      <p class="eyebrow">Register your interest</p>
+      <h2 class="display text-fluid-h1 mt-5 sm:mt-6">
+        Be among the first<br/>
+        <span class="text-paper/45">to know when the story begins.</span>
+      </h2>
+      <p class="lede text-paper/75 mt-6 sm:mt-8 max-w-prose">
+        We&rsquo;ll be in touch as soon as details are ready to share &mdash; renders, floorplans,
+        pricing, and priority access before public launch.
+      </p>
+
+      <form id="interest-form" class="mt-10 sm:mt-14" data-endpoint={endpoint} novalidate>
+        <div class="grid sm:grid-cols-2 gap-x-8 gap-y-7 sm:gap-y-8">
+          <div class="field-group" data-field="firstName">
+            <label for="firstName" class="field-label text-paper/60">First name</label>
+            <input id="firstName" name="firstName" type="text" required autocomplete="given-name"
+              class="field text-paper placeholder:text-paper/30 border-paper/25 focus:border-gold" />
+            <p class="field-error" role="alert"></p>
+          </div>
+          <div class="field-group" data-field="lastName">
+            <label for="lastName" class="field-label text-paper/60">Last name</label>
+            <input id="lastName" name="lastName" type="text" required autocomplete="family-name"
+              class="field text-paper placeholder:text-paper/30 border-paper/25 focus:border-gold" />
+            <p class="field-error" role="alert"></p>
+          </div>
+          <div class="field-group" data-field="email">
+            <label for="email" class="field-label text-paper/60">Email</label>
+            <input id="email" name="email" type="email" required autocomplete="email" inputmode="email"
+              class="field text-paper placeholder:text-paper/30 border-paper/25 focus:border-gold" />
+            <p class="field-error" role="alert"></p>
+          </div>
+          <div class="field-group" data-field="phone">
+            <label for="phone" class="field-label text-paper/60">Phone</label>
+            <input id="phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel"
+              placeholder="+971 …"
+              class="field text-paper placeholder:text-paper/30 border-paper/25 focus:border-gold" />
+            <p class="field-error" role="alert"></p>
+          </div>
+          <div class="field-group" data-field="city">
+            <label for="city" class="field-label text-paper/60">City</label>
+            <input id="city" name="city" type="text" required autocomplete="address-level2"
+              placeholder="Where you're based"
+              class="field text-paper placeholder:text-paper/30 border-paper/25 focus:border-gold" />
+            <p class="field-error" role="alert"></p>
+          </div>
+          <div class="field-group" data-field="unitType">
+            <label for="unitType" class="field-label text-paper/60">Interested in</label>
+            <div class="relative">
+              <select id="unitType" name="unitType" required
+                class="field text-paper border-paper/25 focus:border-gold bg-midnight appearance-none pr-8">
+                <option value="" class="text-midnight">Home type</option>
+                {unitTypes.map((u) => (
+                  <option value={u} class="text-midnight">{u}</option>
+                ))}
+              </select>
+              <svg class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 text-paper/60"
+                   viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <p class="field-error" role="alert"></p>
+          </div>
+        </div>
+
+        <div class="field-group mt-8 sm:mt-10" data-field="consent">
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" name="consent" required
+              class="mt-1 h-5 w-5 accent-gold shrink-0" />
+            <span class="text-sm text-paper/70 leading-relaxed">
+              Yes, keep me posted with updates, renders, and priority access ahead of public launch.
+            </span>
+          </label>
+          <p class="field-error" role="alert"></p>
+        </div>
+
+        <div class="mt-10 sm:mt-12 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-5 sm:gap-6">
+          <button type="submit" class="btn-primary bg-gold text-midnight hover:bg-paper w-full sm:w-auto min-h-[3rem]" data-submit>
+            <span data-submit-idle>Register interest</span>
+            <span data-submit-loading class="hidden">Sending&hellip;</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </button>
+          <p class="text-xs text-paper/50 max-w-xs leading-relaxed">
+            By registering you agree to be contacted about this development. Your details won&rsquo;t be shared with third parties.
+          </p>
+        </div>
+
+        <div id="form-error" class="hidden mt-6 sm:mt-8 p-4 border border-red-400/40 rounded-xl bg-red-500/10">
+          <p class="text-sm text-red-200">Something didn&rsquo;t send. Please try again in a moment.</p>
+        </div>
+      </form>
+    </div>
+
+    <!-- ─── THANK-YOU VIEW ─── -->
+    <div id="thankyou-view" class="hidden">
+      <div class="max-w-2xl">
+        <!-- Elegant checkmark badge -->
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-full border border-gold/40 bg-gold/10 mb-6">
+          <svg class="w-6 h-6 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12l4 4L19 6"/>
+          </svg>
+        </div>
+
+        <p class="eyebrow">You&rsquo;re on the list</p>
+        <h2 class="display text-fluid-h1 mt-5 sm:mt-6">
+          Thank you<span data-thankyou-name></span>.<br/>
+          <span class="text-paper/45 italic">The story begins soon.</span>
+        </h2>
+
+        <p class="lede text-paper/75 mt-6 sm:mt-8 max-w-prose">
+          We&rsquo;ve received your details and we&rsquo;ll be in touch at
+          <span data-thankyou-email class="text-gold"></span>
+          the moment the first renders, floorplans, and priority-access dates are ready.
+        </p>
+
+        <dl class="mt-8 sm:mt-10 grid xs:grid-cols-2 gap-x-8 gap-y-6 pt-6 sm:pt-8 border-t border-paper/15">
+          <div>
+            <dt class="text-[10px] uppercase tracking-eyebrow2 text-paper/50 leading-tight">Interested in</dt>
+            <dd class="font-display text-xl sm:text-2xl mt-2 text-paper" data-thankyou-unit>&mdash;</dd>
+          </div>
+          <div>
+            <dt class="text-[10px] uppercase tracking-eyebrow2 text-paper/50 leading-tight">City</dt>
+            <dd class="font-display text-xl sm:text-2xl mt-2 text-paper" data-thankyou-city>&mdash;</dd>
+          </div>
+        </dl>
+
+        <div class="mt-10 sm:mt-12 flex flex-col sm:flex-row sm:items-center gap-5">
+          <button type="button" class="btn-primary bg-gold text-midnight hover:bg-paper w-full sm:w-auto" data-reset>
+            Register another
+            <span class="arrow" aria-hidden="true">→</span>
+          </button>
+          <p class="text-xs text-paper/50 max-w-xs leading-relaxed">
+            A confirmation is on its way to your inbox.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  /* ─────────────────── Validation + submit ─────────────────── */
+
+  type FieldName = 'firstName' | 'lastName' | 'email' | 'phone' | 'city' | 'unitType' | 'consent';
+
+  const messages: Record<FieldName, { required?: string; format?: string }> = {
+    firstName: { required: 'Please enter your first name.' },
+    lastName:  { required: 'Please enter your last name.' },
+    email:     { required: 'Please enter your email.',   format: 'Please enter a valid email address.' },
+    phone:     { required: 'Please enter your phone.',   format: 'Please enter a valid phone number.' },
+    city:      { required: 'Please enter your city.' },
+    unitType:  { required: 'Please pick a home type.' },
+    consent:   { required: 'Please confirm to receive updates.' },
+  };
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const PHONE_RE = /^[+\d][\d\s().\-]{6,}$/;
+
+  const form         = document.getElementById('interest-form') as HTMLFormElement | null;
+  const formView     = document.getElementById('form-view')     as HTMLElement | null;
+  const thankyouView = document.getElementById('thankyou-view') as HTMLElement | null;
+  const errorEl      = document.getElementById('form-error')    as HTMLElement | null;
+  const resetBtn     = document.querySelector('[data-reset]')   as HTMLButtonElement | null;
+  const submitBtn    = document.querySelector('[data-submit]')  as HTMLButtonElement | null;
+  const submitIdle   = document.querySelector('[data-submit-idle]')    as HTMLElement | null;
+  const submitLoad   = document.querySelector('[data-submit-loading]') as HTMLElement | null;
+
+  const groupFor = (name: FieldName) =>
+    form?.querySelector<HTMLElement>(`.field-group[data-field="${name}"]`);
+
+  const setError = (name: FieldName, msg: string | null) => {
+    const group = groupFor(name);
+    if (!group) return;
+    const errEl = group.querySelector<HTMLElement>('.field-error');
+    const input = group.querySelector<HTMLInputElement | HTMLSelectElement>('input, select');
+    if (msg) {
+      group.classList.add('has-error');
+      if (errEl) errEl.textContent = msg;
+      input?.setAttribute('aria-invalid', 'true');
+    } else {
+      group.classList.remove('has-error');
+      if (errEl) errEl.textContent = '';
+      input?.removeAttribute('aria-invalid');
+    }
+  };
+
+  const validateField = (name: FieldName, value: string, checked?: boolean): string | null => {
+    const m = messages[name];
+    if (name === 'consent') {
+      if (!checked) return m.required ?? null;
+      return null;
+    }
+    if (!value || !value.trim()) return m.required ?? null;
+    if (name === 'email' && !EMAIL_RE.test(value.trim())) return m.format ?? null;
+    if (name === 'phone' && !PHONE_RE.test(value.trim())) return m.format ?? null;
+    return null;
+  };
+
+  const validateAll = (): { valid: boolean; firstInvalid: FieldName | null } => {
+    if (!form) return { valid: false, firstInvalid: null };
+    const data = new FormData(form);
+    let firstInvalid: FieldName | null = null;
+    (Object.keys(messages) as FieldName[]).forEach((name) => {
+      const val = (data.get(name) as string | null) ?? '';
+      const checked = name === 'consent' ? Boolean(data.get('consent')) : undefined;
+      const err = validateField(name, val, checked);
+      setError(name, err);
+      if (err && !firstInvalid) firstInvalid = name;
+    });
+    return { valid: !firstInvalid, firstInvalid };
+  };
+
+  /* Live-validate: clear the error as the user fixes it, re-validate on blur. */
+  form?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select').forEach((el) => {
+    el.addEventListener('blur', () => {
+      const name = el.name as FieldName;
+      if (!(name in messages)) return;
+      const val = el.type === 'checkbox' ? '' : (el as HTMLInputElement).value;
+      const checked = el.type === 'checkbox' ? (el as HTMLInputElement).checked : undefined;
+      setError(name, validateField(name, val, checked));
+    });
+    el.addEventListener('input', () => {
+      const name = el.name as FieldName;
+      if (!(name in messages)) return;
+      const group = groupFor(name);
+      if (group?.classList.contains('has-error')) {
+        const val = el.type === 'checkbox' ? '' : (el as HTMLInputElement).value;
+        const checked = el.type === 'checkbox' ? (el as HTMLInputElement).checked : undefined;
+        setError(name, validateField(name, val, checked));
+      }
+    });
+  });
+
+  const setLoading = (loading: boolean) => {
+    if (!submitBtn) return;
+    submitBtn.disabled = loading;
+    submitIdle?.classList.toggle('hidden', loading);
+    submitLoad?.classList.toggle('hidden', !loading);
+  };
+
+  const showThankYou = (data: Record<string, string>) => {
+    if (!formView || !thankyouView) return;
+    const nameEl  = document.querySelector('[data-thankyou-name]')  as HTMLElement | null;
+    const emailEl = document.querySelector('[data-thankyou-email]') as HTMLElement | null;
+    const unitEl  = document.querySelector('[data-thankyou-unit]')  as HTMLElement | null;
+    const cityEl  = document.querySelector('[data-thankyou-city]')  as HTMLElement | null;
+    if (nameEl)  nameEl.textContent  = data.firstName ? `, ${data.firstName}` : '';
+    if (emailEl) emailEl.textContent = data.email || '';
+    if (unitEl)  unitEl.textContent  = data.unitType || '—';
+    if (cityEl)  cityEl.textContent  = data.city || '—';
+    formView.classList.add('hidden');
+    thankyouView.classList.remove('hidden');
+    thankyouView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const resetForm = () => {
+    if (!form || !formView || !thankyouView) return;
+    form.reset();
+    (Object.keys(messages) as FieldName[]).forEach((n) => setError(n, null));
+    thankyouView.classList.add('hidden');
+    formView.classList.remove('hidden');
+    setLoading(false);
+    formView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  resetBtn?.addEventListener('click', resetForm);
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!form) return;
+    errorEl?.classList.add('hidden');
+
+    const { valid, firstInvalid } = validateAll();
+    if (!valid) {
+      if (firstInvalid) {
+        const group = groupFor(firstInvalid);
+        const input = group?.querySelector<HTMLInputElement | HTMLSelectElement>('input, select');
+        input?.focus();
+        group?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    const endpoint = form.dataset.endpoint || '/api/lead';
+    const fd = new FormData(form);
+    const payload: Record<string, string> = {};
+    fd.forEach((v, k) => { payload[k] = String(v); });
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        showThankYou(payload);
+        return;
+      }
+      /* /api/lead doesn't exist during local Astro dev (no serverless runtime).
+         Fall back to the thank-you view + console log so the UI stays testable. */
+      if (res.status === 404) {
+        console.info('[register] /api/lead not deployed (dev mode). Payload:', payload);
+        showThankYou(payload);
+        return;
+      }
+      throw new Error(`HTTP ${res.status}`);
+    } catch (err) {
+      console.error('[register] submit failed', err);
+      errorEl?.classList.remove('hidden');
+      setLoading(false);
+    }
+  });
+</script>
+
+<style>
+  .field-error {
+    display: none;
+    margin-top: 0.5rem;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #FFB4A4;
+    letter-spacing: 0.02em;
+  }
+  .field-group.has-error .field-error { display: block; }
+  .field-group.has-error .field { border-bottom-color: #FFB4A4 !important; }
+  .field-group.has-error input[type='checkbox'] { outline: 2px solid #FFB4A4; outline-offset: 3px; }
+</style>

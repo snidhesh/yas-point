@@ -1,0 +1,85 @@
+---
+const phases = [
+  { label: 'I',   codename: 'The Groves',   count: 6, layout: 'G+8 · park-facing',   note: '592 units · launching' },
+  { label: 'II',  codename: 'The Overlook', count: 6, layout: 'Park & canal',        note: 'To be revealed' },
+  { label: 'III', codename: 'The Bay',      count: 9, layout: 'Marina & shore',      note: 'To be revealed' },
+];
+
+const stats = [
+  { value: 6,   prefix: '$', suffix: 'B',   label: 'Value' },
+  { value: 21,  prefix: '',  suffix: '',    label: 'Buildings' },
+  { value: 6,   prefix: '',  suffix: 'yrs', label: 'Timeline' },
+  { value: 592, prefix: '',  suffix: '',    label: 'Chapter I homes' },
+];
+---
+<section id="chapters-end" class="bg-paper text-ink py-8 sm:py-10 md:py-12 overflow-hidden flex items-center">
+  <div class="mx-auto max-w-6xl w-full px-5 sm:px-6 md:px-10">
+    <div class="max-w-3xl reveal">
+      <p class="eyebrow">The masterplan</p>
+      <h2 class="display text-fluid-h2 mt-3">
+        <span class="text-ink/40">Six billion dollars.</span>
+        One vision. <span class="italic">Three chapters.</span>
+      </h2>
+      <p class="lede mt-3 sm:mt-4 max-w-2xl text-fluid-body">
+        Twenty-one buildings across three phases, delivered chapter by chapter over six years &mdash;
+        anchored by a private marina and a five-star hotel resort.
+      </p>
+    </div>
+
+    <div class="mt-5 sm:mt-6 grid md:grid-cols-3 gap-3">
+      {phases.map((phase, i) => (
+        <article class="reveal group relative flex items-baseline gap-4 p-4 sm:p-5 bg-white/60 border border-midnight/10 rounded-xl backdrop-blur-sm transition-all duration-450 ease-silk hover:border-gold/60 hover:shadow-xl hover:-translate-y-0.5">
+          <span class="font-display font-light text-4xl sm:text-5xl md:text-6xl text-midnight/90 leading-none tnum shrink-0">{phase.count}</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-[10px] uppercase tracking-eyebrow2 text-midnight/50">Chapter {phase.label}</p>
+            <p class="font-display italic text-sm sm:text-base text-gold leading-tight">{phase.codename}</p>
+            <p class="text-[10px] sm:text-[11px] text-midnight/60 mt-1 leading-tight">{phase.layout}</p>
+            <p class:list={['text-[10px] uppercase tracking-eyebrow2 mt-1.5 leading-tight', i === 0 ? 'text-gold' : 'text-midnight/40']}>{phase.note}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="mt-5 sm:mt-6 grid grid-cols-4 gap-3 sm:gap-4 pt-4 sm:pt-5 border-t border-midnight/10 reveal">
+      {stats.map((s) => (
+        <div>
+          <p class="font-display font-light text-2xl sm:text-3xl md:text-4xl text-midnight tnum leading-none">
+            {s.prefix}<span class="count-up" data-target={s.value}>0</span>
+            {s.suffix && <span class={s.suffix === 'yrs' ? 'text-sm sm:text-base md:text-lg text-midnight/60 ml-1' : ''}>{s.suffix}</span>}
+          </p>
+          <p class="text-[9px] sm:text-[10px] uppercase tracking-eyebrow2 text-midnight/60 mt-1.5 leading-tight">{s.label}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const targets = document.querySelectorAll<HTMLElement>('.count-up');
+  if (targets.length) {
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+    const animate = (el: HTMLElement) => {
+      const target = Number(el.dataset.target ?? '0');
+      const duration = 1400;
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        el.textContent = String(Math.round(easeOut(t) * target));
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            animate(entry.target as HTMLElement);
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.35 }
+    );
+    targets.forEach((el) => io.observe(el));
+  }
+</script>

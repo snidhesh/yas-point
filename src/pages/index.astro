@@ -1,0 +1,138 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Imagine from '../components/Imagine.astro';
+import Ticker from '../components/Ticker.astro';
+import MoodStory from '../components/MoodStory.astro';
+import Masterplan from '../components/Masterplan.astro';
+import Residences from '../components/Residences.astro';
+import RegisterForm from '../components/RegisterForm.astro';
+import Footer from '../components/Footer.astro';
+import ChapterCounter from '../components/ChapterCounter.astro';
+import StickyCTA from '../components/StickyCTA.astro';
+---
+<Base>
+  <ChapterCounter total={6} />
+  <StickyCTA />
+
+  <Hero />
+  <Imagine />
+  <Ticker />
+
+  <MoodStory
+    chapter="01"
+    chapterLabel="Extraordinary lights"
+    tone="dark"
+    eyebrow="Where the extraordinary lives"
+    posterSrc="/images/lights.jpeg"
+    posterAlt="Family on a boardwalk watching fireworks light the night sky"
+    posterKicker="Nights, remembered"
+    posterHeadline="Extraordinary lights up the night."
+    title="A postcode with"
+    titleAccent="fireworks in the forecast."
+    body="Right next door to the region's most iconic family destination, evenings here don't just end — they climax. Fireworks reflected in the canal. Music drifting across the water. A skyline of storybook silhouettes, so close you can almost hear it."
+    meta={[
+      { label: 'Front row to', value: 'The magic' },
+      { label: 'Walking distance', value: 'Every night' },
+    ]}
+    eager={true}
+  />
+
+  <MoodStory
+    chapter="02"
+    chapterLabel="The Groves"
+    tone="light"
+    reverse={true}
+    eyebrow="Chapter one — The Groves"
+    posterSrc="/images/garden.jpeg"
+    posterAlt="A figure in a flowing dress moving through a glowing garden at dusk"
+    posterKicker="Park-facing residences"
+    posterHeadline="Where the garden glows to life."
+    title="Six buildings."
+    titleAccent="One long, green breath."
+    body="The first chapter is called The Groves — six low-rise residences, G+8, wrapped around a park that comes alive at dusk. Trees strung with light. Pathways that curl to the water. A garden your children will grow up remembering."
+    meta={[
+      { label: 'Layout', value: 'G+8' },
+      { label: 'Chapter One homes', value: '592' },
+    ]}
+  />
+
+  <MoodStory
+    chapter="03"
+    chapterLabel="The private marina"
+    tone="dark"
+    eyebrow="The private marina"
+    posterSrc="/images/marina.jpeg"
+    posterAlt="A sailing yacht mast reflected in still marina water at sunrise"
+    posterKicker="Yours, at anchor"
+    posterHeadline="The view is the occasion."
+    title="A private marina —"
+    titleAccent="and the mornings it makes possible."
+    body="A private marina at your address. Not a metaphor. Yachts at anchor by breakfast. Coffee on a promenade that curls to meet you. The kind of view that turns a Tuesday into a Sunday and every Sunday into a memory."
+    meta={[
+      { label: 'Marina', value: 'Private' },
+      { label: 'View', value: 'Every direction' },
+    ]}
+  />
+
+  <MoodStory
+    chapter="04"
+    chapterLabel="Five-star hotel resort"
+    tone="sand"
+    reverse={true}
+    eyebrow="The five-star hotel resort"
+    posterSrc="/images/tide.jpeg"
+    posterAlt="A couple walking a lantern-lit boardwalk toward a waterfront restaurant"
+    posterKicker="A resort you can walk to"
+    posterHeadline="Where taste meets the tide."
+    title="A five-star resort,"
+    titleAccent="right down the boardwalk."
+    body="A five-star hotel resort woven into the district. Restaurants that keep hours the way the tide does — always on, always changing. The kind of dining rooms you dress for, and the kind of nights you never quite remember ending."
+    meta={[
+      { label: 'Hotel', value: 'Five-star' },
+      { label: 'Distance from home', value: 'A short walk' },
+    ]}
+  />
+
+  <MoodStory
+    chapter="05"
+    chapterLabel="Public beach · private bay"
+    tone="dark"
+    eyebrow="Public beach · private bay"
+    posterSrc="/images/beach.jpeg"
+    posterAlt="A swimmer diving through clear turquoise water above a coral reef"
+    posterKicker="Sand at your address"
+    posterHeadline="The beach shares your address."
+    title="A public beach."
+    titleAccent="A private bay. A jetty of your own."
+    body="A public beach, threaded into the plan — because the best coastlines are the ones everyone gets to love. And a private bay with a jetty, for the mornings you want the sea entirely to yourself."
+    meta={[
+      { label: 'Beach', value: 'Public' },
+      { label: 'Bay & jetty', value: 'Private' },
+    ]}
+  />
+
+  <MoodStory
+    chapter="06"
+    chapterLabel="Branded residences"
+    tone="linen"
+    reverse={true}
+    eyebrow="Branded residences"
+    posterSrc="/images/horizon.jpeg"
+    posterAlt="A moonlit infinity pool overlooking the sea at night"
+    posterKicker="An address, quieter"
+    posterHeadline="Where the sea meets the horizon."
+    title="A collection of 125"
+    titleAccent="branded residences."
+    body="Inside Chapter One, a private collection of 125 branded residences — for those who want the same address, told just a little louder. Interiors by a name you already know. Views that only slow down when you tell them to."
+    meta={[
+      { label: 'Branded homes', value: '125' },
+      { label: 'Range', value: 'Studio → 3BR' },
+    ]}
+  />
+
+  <Masterplan />
+  <Residences />
+  <RegisterForm />
+  <Footer />
+</Base>

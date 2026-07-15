@@ -1,0 +1,70 @@
+---
+interface Props {
+  total: number;
+}
+const { total } = Astro.props;
+const totalStr = String(total).padStart(2, '0');
+---
+<div id="chapter-counter" class="chapter-counter" aria-hidden="true">
+  <span class="cc-num tnum" data-current>01</span>
+  <span class="cc-slash">/</span>
+  <span class="cc-total tnum">{totalStr}</span>
+  <span class="cc-divider" aria-hidden="true"></span>
+  <span class="cc-label" data-label>Extraordinary lights</span>
+</div>
+
+<script>
+  const counter = document.getElementById('chapter-counter');
+  if (counter) {
+    const numEl = counter.querySelector('[data-current]');
+    const labelEl = counter.querySelector('[data-label]');
+    const chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-chapter]'));
+    if (chapters.length === 0) {
+      counter.remove();
+    } else {
+      let hideTimer: number | undefined;
+
+      const updateFrom = (el: HTMLElement) => {
+        const idx = el.dataset.chapter ?? '01';
+        const label = el.dataset.chapterLabel ?? '';
+        if (numEl && numEl.textContent !== idx) numEl.textContent = idx;
+        if (labelEl && labelEl.textContent !== label) labelEl.textContent = label;
+      };
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          let bestEntry: IntersectionObserverEntry | null = null;
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+                bestEntry = entry;
+              }
+            }
+          }
+          if (bestEntry) {
+            updateFrom(bestEntry.target as HTMLElement);
+            counter.classList.add('is-visible');
+            if (hideTimer) window.clearTimeout(hideTimer);
+          }
+        },
+        { threshold: [0.15, 0.4, 0.7], rootMargin: '-15% 0px -15% 0px' }
+      );
+      chapters.forEach((el) => io.observe(el));
+
+      const endMarker = document.getElementById('chapters-end');
+      if (endMarker) {
+        const endIo = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                hideTimer = window.setTimeout(() => counter.classList.remove('is-visible'), 250);
+              }
+            }
+          },
+          { threshold: 0.05 }
+        );
+        endIo.observe(endMarker);
+      }
+    }
+  }
+</script>

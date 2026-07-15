@@ -1,0 +1,20 @@
+---
+import BrandMark from './BrandMark.astro';
+const year = new Date().getFullYear();
+---
+<footer class="bg-deep text-paper/55 border-t border-paper/10 py-10 sm:py-12 md:py-14 pb-[calc(env(safe-area-inset-bottom)+2.5rem)] grain-overlay">
+  <div class="mx-auto max-w-6xl px-5 sm:px-6 md:px-10">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 sm:gap-8">
+      <BrandMark tone="light" />
+      <p class="text-[10px] sm:text-xs uppercase tracking-eyebrow2 max-w-md leading-relaxed">
+        A new waterfront district. Details, renders, and launch dates will be shared with registered interest first.
+      </p>
+      <div class="flex flex-wrap gap-x-6 gap-y-2 text-[10px] sm:text-xs uppercase tracking-eyebrow2">
+        <a href="#" class="hover:text-paper transition-colors duration-450">Privacy</a>
+        <a href="#" class="hover:text-paper transition-colors duration-450">Terms</a>
+        <a href="#register" class="hover:text-paper transition-colors duration-450">Register</a>
+      </div>
+    </div>
+    <p class="mt-8 sm:mt-10 text-[10px] sm:text-xs text-paper/35 leading-relaxed max-w-2xl">© {year} All rights reserved. Every detail on this page is illustrative &mdash; the story is still being written.</p>
+  </div>
+</footer>

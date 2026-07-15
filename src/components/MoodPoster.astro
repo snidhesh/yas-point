@@ -1,0 +1,37 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  kicker: string;
+  headline: string;
+  body?: string;
+  align?: 'left' | 'right';
+  eager?: boolean;
+}
+const { src, alt, kicker, headline, body, align = 'left', eager = false } = Astro.props;
+---
+<figure class="poster relative w-full aspect-[4/5] xs:aspect-[3/4] overflow-hidden rounded-2xl md:rounded-3xl bg-midnight shadow-2xl grain-overlay">
+  <img
+    src={src}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    class="poster-img absolute inset-0 w-full h-full object-cover"
+  />
+
+  <!-- Light bottom gradient just for headline legibility over the visible atmospheric strip. -->
+  <div class="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-black via-black/70 to-transparent z-[1]" aria-hidden="true"></div>
+
+  <figcaption class={`absolute inset-0 z-[2] flex flex-col justify-between p-6 sm:p-8 md:p-10 text-paper ${align === 'right' ? 'items-end text-right' : ''}`}>
+    <p class="eyebrow-plain text-gold">{kicker}</p>
+    <div class={`max-w-md ${align === 'right' ? 'ml-auto' : ''}`}>
+      <h3 class="display text-fluid-h3 md:text-fluid-h2 !leading-[1.05]">{headline}</h3>
+      <span class="poster-underline mt-4 block h-px bg-gold" aria-hidden="true"></span>
+      {body && (
+        <p class="mt-4 text-sm md:text-base text-paper/80 leading-relaxed font-light">{body}</p>
+      )}
+    </div>
+  </figcaption>
+
+  <span class="poster-arrow absolute bottom-6 right-6 md:bottom-8 md:right-8 z-[3] inline-flex items-center justify-center w-10 h-10 rounded-full border border-paper/30 text-paper/90 text-lg" aria-hidden="true">→</span>
+</figure>

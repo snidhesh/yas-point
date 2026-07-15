@@ -1,0 +1,49 @@
+---
+const homes = [
+  { type: 'Studios',       line: 'For the first chapter.' },
+  { type: 'One bedroom',   line: 'Room to grow into.' },
+  { type: 'Two bedroom',   line: 'For the ones you love.' },
+  { type: 'Three bedroom', line: 'For everything that comes next.' },
+];
+---
+<section class="bg-linen text-ink py-8 sm:py-10 md:py-12 overflow-hidden flex items-center">
+  <div class="mx-auto max-w-6xl w-full px-5 sm:px-6 md:px-10">
+    <div class="max-w-3xl reveal">
+      <p class="eyebrow">The residences</p>
+      <h2 class="display text-fluid-h2 mt-3">
+        A first home. A family home.
+        <span class="text-ink/45 italic">Same address, different chapters.</span>
+      </h2>
+      <p class="lede mt-3 sm:mt-4 max-w-2xl text-fluid-body">
+        Chapter One opens with 592 homes &mdash; studios to three-bedroom &mdash; wrapped around a
+        park and finished to G+8. Among them, 125 branded residences.
+      </p>
+    </div>
+
+    <div class="mt-5 sm:mt-6 grid xs:grid-cols-2 md:grid-cols-4 gap-px bg-midnight/10 border border-midnight/10 rounded-xl overflow-hidden">
+      {homes.map((home) => (
+        <div class="reveal bg-linen p-3 sm:p-4 flex flex-col hover:bg-paper transition-colors duration-450 ease-silk">
+          <p class="eyebrow-plain">{home.type}</p>
+          <p class="font-display font-light text-base sm:text-lg md:text-xl mt-1.5 leading-tight">{home.line}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-5 sm:mt-6 grid xs:grid-cols-2 gap-4 sm:gap-6 pt-4 sm:pt-5 border-t border-midnight/10 reveal">
+      <div class="flex items-baseline gap-3">
+        <span class="font-display font-light text-3xl sm:text-4xl text-midnight leading-none tnum">125</span>
+        <div class="min-w-0">
+          <p class="text-[9px] sm:text-[10px] uppercase tracking-eyebrow2 text-midnight/50 leading-tight">Branded residences</p>
+          <p class="text-xs text-ink/70 mt-0.5 leading-snug">A rare, quieter address inside the address.</p>
+        </div>
+      </div>
+      <div class="flex items-baseline gap-3">
+        <span class="font-display font-light text-3xl sm:text-4xl text-midnight leading-none">G+8</span>
+        <div class="min-w-0">
+          <p class="text-[9px] sm:text-[10px] uppercase tracking-eyebrow2 text-midnight/50 leading-tight">Building rhythm</p>
+          <p class="text-xs text-ink/70 mt-0.5 leading-snug">Low-rise living, high-touch design.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

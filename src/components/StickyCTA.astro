@@ -1,0 +1,63 @@
+---
+---
+<a href="#register" id="sticky-cta" class="sticky-cta" aria-label="Register your interest">
+  <span>Register</span>
+  <span class="arrow" aria-hidden="true">
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+      <path d="M1 5h8m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+</a>
+
+<script>
+  const cta = document.getElementById('sticky-cta');
+  const hero = document.querySelector('section:first-of-type');
+  const footer = document.querySelector('footer');
+  const registerSection = document.getElementById('register');
+
+  if (cta && hero) {
+    const state = { pastHero: false, atRegister: false, atFooter: false };
+
+    const apply = () => {
+      const show = state.pastHero && !state.atRegister && !state.atFooter;
+      cta.classList.toggle('is-visible', show);
+    };
+
+    const heroIo = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          state.pastHero = !entry.isIntersecting;
+        }
+        apply();
+      },
+      { threshold: 0.1 }
+    );
+    heroIo.observe(hero);
+
+    if (registerSection) {
+      const regIo = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            state.atRegister = entry.isIntersecting;
+          }
+          apply();
+        },
+        { threshold: 0.2 }
+      );
+      regIo.observe(registerSection);
+    }
+
+    if (footer) {
+      const footIo = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            state.atFooter = entry.isIntersecting;
+          }
+          apply();
+        },
+        { threshold: 0.1 }
+      );
+      footIo.observe(footer);
+    }
+  }
+</script>

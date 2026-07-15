@@ -1,0 +1,21 @@
+---
+interface Props {
+  tone?: 'light' | 'dark';
+  showPhrase?: boolean;
+}
+const { tone = 'light', showPhrase = true } = Astro.props;
+const stroke = tone === 'light' ? '#F5F8FB' : '#0F1F2E';
+const accent = '#93B4CE';
+const textClass = tone === 'light' ? 'text-paper/70' : 'text-midnight/60';
+---
+<div class="inline-flex items-center gap-3">
+  <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true">
+    <circle cx="20" cy="14" r="6" fill="none" stroke={accent} stroke-width="1.4"/>
+    <path d="M20 8 a 6 6 0 0 0 0 12" fill={accent}/>
+    <path d="M4 28 Q 12 24 20 28 T 36 28" stroke={stroke} stroke-width="1.2" fill="none" stroke-opacity="0.7"/>
+    <path d="M4 32 Q 12 28 20 32 T 36 32" stroke={stroke} stroke-width="1" fill="none" stroke-opacity="0.4"/>
+  </svg>
+  {showPhrase && (
+    <span class={`font-sans italic font-light text-sm tracking-tight3 ${textClass}`}>still unwritten</span>
+  )}
+</div>
