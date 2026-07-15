@@ -130,10 +130,15 @@
     min-height: 100svh;
     z-index: 10;               /* stays above the footer while pinned */
     transform-origin: center top;
-    transform: scale(var(--stack-scale, 1));
+    /* translate3d(0,0,0) forces the section onto its own GPU layer, so the
+       scroll-driven scale/opacity animation composites off-thread on iOS/Android
+       instead of thrashing the main thread. */
+    transform: translate3d(0, 0, 0) scale(var(--stack-scale, 1));
     opacity: var(--stack-opacity, 1);
-    transition: transform 120ms linear, opacity 120ms linear;
+    transition: transform 140ms linear, opacity 140ms linear;
     will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   /* Rounded top corners + top shadow so each stacking card reads as an
