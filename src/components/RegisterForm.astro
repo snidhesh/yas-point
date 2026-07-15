@@ -4,15 +4,58 @@
    on the server (set in Vercel dashboard for production). */
 const endpoint = '/api/lead';
 const unitTypes = ['Studio', '1 Bedroom', '2 Bedroom', '3 Bedroom', 'Not sure yet'];
+
+/* The six chapters shown as a bookshelf alongside the form.
+   Each has the mood image from its MoodStory + the anchor ID. */
+const chapters = [
+  { num: '01', label: 'Extraordinary lights', image: '/images/lights.jpeg'  },
+  { num: '02', label: 'The Groves',           image: '/images/garden.jpeg'  },
+  { num: '03', label: 'Private marina',       image: '/images/marina.jpeg'  },
+  { num: '04', label: 'Five-star resort',     image: '/images/tide.jpeg'    },
+  { num: '05', label: 'Beach & bay',          image: '/images/beach.jpeg'   },
+  { num: '06', label: 'Branded residences',   image: '/images/horizon.jpeg' },
+];
 ---
 <section id="register" class="relative bg-midnight text-paper !pt-0 pb-12 sm:pb-14 md:pb-16 lg:pb-20 overflow-hidden grain-overlay">
   <div class="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] rounded-full bg-gold/5 blur-3xl"></div>
 
-  <div class="mx-auto max-w-4xl px-5 sm:px-6 md:px-10 relative">
+  <div class="mx-auto max-w-6xl px-5 sm:px-6 md:px-10 relative">
 
-    <!-- ─── FORM VIEW ─── -->
-    <div id="form-view">
-      <p class="eyebrow">Register your interest</p>
+    <!-- ─── FORM VIEW (two-column: chapters left, form right) ─── -->
+    <div id="form-view" class="pt-12 sm:pt-16 lg:pt-20 grid lg:grid-cols-[380px_1fr] gap-10 lg:gap-14 xl:gap-20">
+
+      <!-- Left column: chapters stacked vertically -->
+      <aside class="chapters-nav">
+        <p class="eyebrow">The chapters</p>
+        <p class="text-[11px] sm:text-xs text-paper/50 mt-2 leading-relaxed">
+          The story so far &mdash; tap any chapter to revisit.
+        </p>
+
+        <ul class="mt-5 sm:mt-6 flex flex-col gap-2">
+          {chapters.map((ch) => (
+            <li>
+              <a href={`#chapter-${ch.num}`}
+                 class="spine group relative flex items-center gap-4 h-16 sm:h-[72px] px-4 rounded-md overflow-hidden border border-paper/10 hover:border-gold/60 transition-all duration-450 ease-silk"
+                 aria-label={`Revisit chapter ${ch.num}: ${ch.label}`}>
+                <!-- Image background -->
+                <img src={ch.image} alt="" loading="lazy"
+                     class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-silk group-hover:scale-105"/>
+                <!-- Dark scrim for text readability -->
+                <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/55 group-hover:from-black/75 group-hover:via-black/55 group-hover:to-black/40 transition-colors duration-450"></div>
+
+                <!-- Content -->
+                <span class="relative text-lg sm:text-xl font-display font-light text-gold tnum">{ch.num}</span>
+                <span class="relative text-xs sm:text-sm text-paper/90 group-hover:text-paper font-light tracking-wide transition-colors duration-450">{ch.label}</span>
+                <span class="relative ml-auto text-paper/40 group-hover:text-gold text-xs transition-colors duration-450" aria-hidden="true">↑</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+
+      <!-- Right column: register form -->
+      <div>
+        <p class="eyebrow">Register your interest</p>
       <h2 class="display text-fluid-h1 mt-5 sm:mt-6">
         Be among the first<br/>
         <span class="text-paper/45">to know when the story begins.</span>
@@ -101,7 +144,8 @@ const unitTypes = ['Studio', '1 Bedroom', '2 Bedroom', '3 Bedroom', 'Not sure ye
           <p class="text-sm text-red-200">Something didn&rsquo;t send. Please try again in a moment.</p>
         </div>
       </form>
-    </div>
+      </div><!-- /form column -->
+    </div><!-- /#form-view grid -->
 
     <!-- ─── THANK-YOU VIEW ─── -->
     <div id="thankyou-view" class="hidden">
@@ -137,8 +181,8 @@ const unitTypes = ['Studio', '1 Bedroom', '2 Bedroom', '3 Bedroom', 'Not sure ye
         </dl>
 
         <div class="mt-10 sm:mt-12 flex flex-col sm:flex-row sm:items-center gap-5">
-          <button type="button" class="btn-primary bg-gold text-midnight hover:bg-paper w-full sm:w-auto" data-reset>
-            Register another
+          <button type="button" class="btn-primary bg-gold text-midnight hover:bg-paper w-full sm:w-auto" data-back-home>
+            Back to homepage
             <span class="arrow" aria-hidden="true">→</span>
           </button>
           <p class="text-xs text-paper/50 max-w-xs leading-relaxed">
@@ -173,10 +217,78 @@ const unitTypes = ['Studio', '1 Bedroom', '2 Bedroom', '3 Bedroom', 'Not sure ye
   const formView     = document.getElementById('form-view')     as HTMLElement | null;
   const thankyouView = document.getElementById('thankyou-view') as HTMLElement | null;
   const errorEl      = document.getElementById('form-error')    as HTMLElement | null;
-  const resetBtn     = document.querySelector('[data-reset]')   as HTMLButtonElement | null;
+  const backHomeBtn  = document.querySelector('[data-back-home]') as HTMLButtonElement | null;
   const submitBtn    = document.querySelector('[data-submit]')  as HTMLButtonElement | null;
   const submitIdle   = document.querySelector('[data-submit-idle]')    as HTMLElement | null;
   const submitLoad   = document.querySelector('[data-submit-loading]') as HTMLElement | null;
+
+  /* Bookshelf spines — smooth-scroll to the target chapter section.
+     Sticky-positioned sections report their pinned position (not their natural
+     flow position) via BOTH getBoundingClientRect and offsetTop once you've
+     scrolled past them. So we measure and cache each section's natural document
+     position at page load (before any scroll happens), and reuse the cached
+     value on click. Re-measure on resize since viewport-relative sticky heights
+     shift positions. */
+  const chapterOffsets = new Map<string, number>();
+
+  const measureChapters = () => {
+    const savedScroll = window.scrollY;
+    if (savedScroll !== 0) {
+      /* Rare: page opened deep-linked. Skip measurement now; we'll pick up
+         values via IntersectionObserver as user scrolls back. */
+      return;
+    }
+    document.querySelectorAll<HTMLElement>('[id^="chapter-"]').forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      chapterOffsets.set(el.id, rect.top + window.scrollY);
+    });
+  };
+
+  /* Fallback: as user scrolls, keep an updated snapshot of section positions
+     by observing when each enters/exits viewport. */
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const el = entry.target as HTMLElement;
+          const rect = el.getBoundingClientRect();
+          const naturalTop = rect.top + window.scrollY;
+          /* Only cache "natural" positions — when element is NOT pinned.
+             A pinned sticky element has rect.top === 0. Skip those. */
+          if (rect.top > 1 || rect.top < -1) {
+            chapterOffsets.set(el.id, naturalTop);
+          }
+        }
+      }
+    },
+    { threshold: [0, 0.01] }
+  );
+
+  document.querySelectorAll<HTMLElement>('[id^="chapter-"]').forEach((el) => io.observe(el));
+
+  measureChapters();
+  window.addEventListener('resize', measureChapters);
+
+  document.querySelectorAll<HTMLAnchorElement>('.spine[href^="#chapter-"]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href) return;
+      const id = href.slice(1);
+      let top = chapterOffsets.get(id);
+
+      /* Fallback: if we don't have a cached position (e.g. deep-linked start),
+         measure it live by getting the target's position relative to the top. */
+      if (top == null) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        const rect = target.getBoundingClientRect();
+        top = rect.top + window.scrollY;
+      }
+
+      e.preventDefault();
+      window.scrollTo({ top, behavior: 'smooth' });
+    });
+  });
 
   const groupFor = (name: FieldName) =>
     form?.querySelector<HTMLElement>(`.field-group[data-field="${name}"]`);
@@ -266,17 +378,20 @@ const unitTypes = ['Studio', '1 Bedroom', '2 Bedroom', '3 Bedroom', 'Not sure ye
     thankyouView.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const resetForm = () => {
-    if (!form || !formView || !thankyouView) return;
-    form.reset();
-    (Object.keys(messages) as FieldName[]).forEach((n) => setError(n, null));
-    thankyouView.classList.add('hidden');
-    formView.classList.remove('hidden');
-    setLoading(false);
-    formView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  /* Also silently reset the form so it's fresh if the user ever scrolls back
+     to the register section later (via the sticky CTA or nav Register link). */
+  const backToHome = () => {
+    if (form && formView && thankyouView) {
+      form.reset();
+      (Object.keys(messages) as FieldName[]).forEach((n) => setError(n, null));
+      thankyouView.classList.add('hidden');
+      formView.classList.remove('hidden');
+      setLoading(false);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  resetBtn?.addEventListener('click', resetForm);
+  backHomeBtn?.addEventListener('click', backToHome);
 
   form?.addEventListener('submit', async (event) => {
     event.preventDefault();

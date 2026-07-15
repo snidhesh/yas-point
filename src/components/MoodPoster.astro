@@ -10,7 +10,7 @@ interface Props {
 }
 const { src, alt, kicker, headline, body, align = 'left', eager = false } = Astro.props;
 ---
-<figure class="poster relative w-full aspect-[4/5] xs:aspect-[3/4] overflow-hidden rounded-2xl md:rounded-3xl bg-midnight shadow-2xl grain-overlay">
+<figure class="poster relative w-full aspect-square xs:aspect-[4/5] sm:aspect-[3/4] overflow-hidden rounded-2xl md:rounded-3xl bg-midnight shadow-2xl grain-overlay">
   <img
     src={src}
     alt={alt}

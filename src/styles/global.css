@@ -149,15 +149,16 @@
     box-shadow: 0 -18px 50px -20px rgba(0, 0, 0, 0.45);
   }
 
-  /* Footer sits below the deck — it only appears when the last card
-     (Register) has fully unpinned and scrolled away. */
+  /* Footer flows naturally after the last stack card. Higher z-index than
+     sticky sections so it always renders on top when it enters the viewport. */
   main.stack > footer {
     position: relative;
-    z-index: 1;
+    z-index: 20;
   }
 
   /* Small sections opt out of the stack — they flow normally between deck cards
-     as compact separators (e.g. the tag row). */
+     as compact separators (e.g. the tag row). Kept at low z-index so subsequent
+     sticky cards can slide over them. */
   main.stack > section.no-stack {
     position: relative;
     min-height: 0;
@@ -169,6 +170,22 @@
     transition: none;
     will-change: auto;
     z-index: 5;
+  }
+
+  /* Register section is the deck's "arrival" — it opts out of sticky so
+     the Footer beneath it can actually be seen. High z-index so it appears
+     on top of the last sticky MoodStory card while scrolling into view. */
+  main.stack > section#register {
+    position: relative;
+    min-height: 0;
+    z-index: 20;
+    transform: none;
+    opacity: 1;
+    box-shadow: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    transition: none;
+    will-change: auto;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -52,11 +52,13 @@ const metaValueClass = tone === 'dark' ? 'text-paper' : 'text-midnight';
 const metaBorderClass = tone === 'dark' ? 'border-paper/15' : 'border-midnight/10';
 ---
 <section
-  class={`${toneClass} py-12 sm:py-14 md:py-16 lg:py-20 overflow-hidden`}
+  id={chapter ? `chapter-${chapter}` : undefined}
+  class={`${toneClass} py-6 xs:py-8 sm:py-12 md:py-14 lg:py-16 overflow-hidden`}
   data-chapter={chapter}
   data-chapter-label={chapterLabel}
+  style="scroll-margin-top: 0;"
 >
-  <div class={`mx-auto max-w-6xl px-5 sm:px-6 md:px-10 grid md:grid-cols-2 gap-10 sm:gap-12 md:gap-16 items-center ${reverse ? 'md:[direction:rtl]' : ''}`}>
+  <div class={`mx-auto max-w-6xl px-5 sm:px-6 md:px-10 grid md:grid-cols-2 gap-5 xs:gap-6 sm:gap-10 md:gap-14 lg:gap-16 items-center ${reverse ? 'md:[direction:rtl]' : ''}`}>
     <div class={`${reverse ? 'md:[direction:ltr]' : ''} reveal`}>
       <MoodPoster
         src={posterSrc}
@@ -70,20 +72,20 @@ const metaBorderClass = tone === 'dark' ? 'border-paper/15' : 'border-midnight/1
 
     <div class={`${reverse ? 'md:[direction:ltr]' : ''} reveal`}>
       <p class:list={['eyebrow', eyebrowClass]}>{eyebrow}</p>
-      <h2 class="display text-fluid-h2 md:text-fluid-h1 mt-5 sm:mt-6">
+      <h2 class="display text-2xl xs:text-fluid-h2 md:text-fluid-h1 mt-3 xs:mt-4 sm:mt-6">
         {title}
         {titleAccent && (<><br/><span class={titleAccentClass}>{titleAccent}</span></>)}
       </h2>
-      <p class:list={['mt-6 sm:mt-8 text-fluid-lead leading-relaxed font-light max-w-prose', bodyClass]}>
+      <p class:list={['mt-3 xs:mt-4 sm:mt-8 text-sm xs:text-fluid-body sm:text-fluid-lead leading-snug xs:leading-relaxed font-light max-w-prose', bodyClass]}>
         {body}
       </p>
 
       {meta.length > 0 && (
-        <dl class={`mt-8 sm:mt-10 grid grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-5 sm:gap-y-6 pt-6 sm:pt-8 border-t ${metaBorderClass}`}>
+        <dl class={`mt-4 xs:mt-6 sm:mt-10 grid grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 xs:gap-y-4 sm:gap-y-6 pt-3 xs:pt-4 sm:pt-8 border-t ${metaBorderClass}`}>
           {meta.map((m) => (
             <div>
-              <dt class:list={['text-[10px] xs:text-[11px] uppercase tracking-eyebrow2 leading-tight', metaLabelClass]}>{m.label}</dt>
-              <dd class:list={['font-display text-xl xs:text-2xl md:text-3xl mt-1.5 sm:mt-2 leading-tight tnum', metaValueClass]}>{m.value}</dd>
+              <dt class:list={['text-[9px] xs:text-[10px] sm:text-[11px] uppercase tracking-eyebrow2 leading-tight', metaLabelClass]}>{m.label}</dt>
+              <dd class:list={['font-display text-base xs:text-lg sm:text-2xl md:text-3xl mt-1 sm:mt-2 leading-tight tnum', metaValueClass]}>{m.value}</dd>
             </div>
           ))}
         </dl>

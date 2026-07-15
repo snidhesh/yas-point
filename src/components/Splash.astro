@@ -1,0 +1,170 @@
+---
+/**
+ * Splash screen — full-viewport overlay shown once per session.
+ * The yas-point mark fades in, holds briefly, and the whole overlay
+ * fades away to reveal the site. Respects prefers-reduced-motion.
+ */
+import BrandMark from './BrandMark.astro';
+---
+
+<div id="splash" class="splash" role="presentation" aria-hidden="true">
+  <div class="splash-scene">
+
+    <!-- Faint atmospheric glow behind the mark -->
+    <div class="splash-glow" aria-hidden="true"></div>
+
+    <div class="splash-content">
+      <div class="splash-mark">
+        <BrandMark tone="light" />
+      </div>
+
+      <p class="splash-eyebrow">Presented by</p>
+
+      <a class="splash-blackoak"
+         href="https://blackoak-re.com"
+         target="_blank"
+         rel="noopener noreferrer"
+         aria-label="BlackOak Real Estate">
+        <picture>
+          <source srcset="/logo/blackoak-wordmark.webp" type="image/webp"/>
+          <img
+            src="/logo/blackoak-wordmark.png"
+            alt="BlackOak Real Estate"
+            width="120"
+            height="32"
+            loading="eager"
+            style="filter: invert(1) brightness(1.1);"
+          />
+        </picture>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const splash = document.getElementById('splash');
+  if (splash) {
+    const KEY = 'yp-splash-seen';
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Already seen this session (or user prefers no motion) — skip immediately. */
+    if (sessionStorage.getItem(KEY) === '1' || reducedMotion) {
+      splash.remove();
+    } else {
+      /* Prevent scroll while splash is visible. */
+      const html = document.documentElement;
+      const prevOverflow = html.style.overflow;
+      html.style.overflow = 'hidden';
+
+      /* Kick off animation on next frame so CSS transitions apply. */
+      requestAnimationFrame(() => splash.classList.add('is-active'));
+
+      /* Total splash lifetime = enter (700ms) + hold (900ms) + exit (600ms) = 2200ms.
+         After that, restore scroll and remove the overlay from the DOM. */
+      window.setTimeout(() => splash.classList.add('is-leaving'), 1600);
+      window.setTimeout(() => {
+        html.style.overflow = prevOverflow;
+        splash.remove();
+        sessionStorage.setItem(KEY, '1');
+      }, 2400);
+    }
+  }
+</script>
+
+<style>
+  .splash {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: linear-gradient(180deg, #050A12 0%, #0F1F2E 60%, #0F2540 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
+  }
+
+  .splash-scene {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(90vw, 480px);
+  }
+
+  /* Warm blue glow behind the mark */
+  .splash-glow {
+    position: absolute;
+    inset: -40% -20% -40% -20%;
+    background: radial-gradient(closest-side, rgba(147, 180, 206, 0.25), rgba(147, 180, 206, 0) 70%);
+    filter: blur(24px);
+    z-index: -1;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .splash.is-active .splash-glow {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.75rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .splash.is-active .splash-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .splash-mark {
+    transform: scale(1.15);
+  }
+
+  .splash-eyebrow {
+    font-size: 10px;
+    line-height: 1.3;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgb(245 248 251 / 0.45);
+    font-weight: 500;
+    font-family: 'Inter', system-ui, sans-serif;
+    margin-top: 0.5rem;
+  }
+
+  .splash-blackoak {
+    display: inline-flex;
+    opacity: 0.8;
+    transition: opacity 300ms ease;
+  }
+  .splash-blackoak:hover { opacity: 1; }
+  .splash-blackoak img {
+    height: 18px;
+    width: auto;
+    display: block;
+  }
+  @media (min-width: 640px) {
+    .splash-blackoak img { height: 22px; }
+  }
+
+  /* Exit: fade the whole overlay off */
+  .splash.is-leaving {
+    opacity: 0;
+    transition: opacity 600ms cubic-bezier(0.65, 0, 0.35, 1);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .splash, .splash-content, .splash-glow, .splash.is-leaving {
+      transition: none;
+      animation: none;
+    }
+  }
+</style>

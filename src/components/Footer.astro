@@ -15,6 +15,33 @@ const year = new Date().getFullYear();
         <a href="#register" class="hover:text-paper transition-colors duration-450">Register</a>
       </div>
     </div>
-    <p class="mt-8 sm:mt-10 text-[10px] sm:text-xs text-paper/35 leading-relaxed max-w-2xl">© {year} All rights reserved. Every detail on this page is illustrative &mdash; the story is still being written.</p>
+
+    <!-- ─── BlackOak sign-off ─── -->
+    <div class="mt-10 sm:mt-12 pt-8 sm:pt-10 border-t border-paper/10 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-6">
+      <p class="text-[10px] sm:text-xs text-paper/35 leading-relaxed max-w-2xl">
+        © {year} All rights reserved. Every detail on this page is illustrative &mdash; the story is still being written.
+      </p>
+
+      <a
+        href="https://blackoak-re.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group inline-flex items-center shrink-0"
+        aria-label="BlackOak Real Estate"
+      >
+        <picture>
+          <source srcset="/logo/blackoak-wordmark.webp" type="image/webp"/>
+          <img
+            src="/logo/blackoak-wordmark.png"
+            alt="BlackOak Real Estate"
+            width="120"
+            height="32"
+            loading="lazy"
+            class="h-6 sm:h-7 w-auto opacity-70 group-hover:opacity-100 transition-opacity duration-450"
+            style="filter: invert(1) brightness(1.05);"
+          />
+        </picture>
+      </a>
+    </div>
   </div>
 </footer>

@@ -69,15 +69,39 @@ import BrandMark from './BrandMark.astro';
   <!-- Top nav -->
   <div class="relative z-20 w-full">
     <div class="mx-auto max-w-7xl px-5 sm:px-6 md:px-10 pt-[calc(env(safe-area-inset-top)+1.25rem)] pb-4 flex items-center justify-between gap-4">
-      <BrandMark tone="light" />
-      <div class="hidden sm:flex items-center gap-6 lg:gap-8">
-        <span class="inline-flex items-center gap-3 text-[10px] uppercase tracking-eyebrow2 text-paper/55">
+      <!-- Left cluster: yas-point identity + BlackOak developer logo, inline. -->
+      <div class="flex items-center gap-3 xs:gap-4 sm:gap-5 md:gap-6">
+        <BrandMark tone="light" />
+        <span class="inline-block h-3.5 xs:h-4 w-px bg-paper/20" aria-hidden="true"></span>
+        <a href="https://blackoak-re.com"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="inline-flex items-center opacity-70 hover:opacity-100 transition-opacity duration-450"
+           aria-label="BlackOak Real Estate">
+          <picture>
+            <source srcset="/logo/blackoak-wordmark.webp" type="image/webp"/>
+            <img
+              src="/logo/blackoak-wordmark.png"
+              alt="BlackOak Real Estate"
+              width="120"
+              height="32"
+              loading="eager"
+              class="h-3.5 xs:h-4 sm:h-5 w-auto"
+              style="filter: invert(1) brightness(1.1);"
+            />
+          </picture>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-4 sm:gap-6 md:gap-8">
+        <span class="hidden md:inline-flex items-center gap-3 text-[10px] uppercase tracking-eyebrow2 text-paper/55">
           <span class="inline-block w-6 h-px bg-paper/25"></span>
           <span class="text-gold font-medium">Chapter I</span>
           <span class="text-paper/25">·</span>
           <span>The Groves</span>
         </span>
-        <a href="#register" class="btn-ghost text-paper/80 hover:text-paper">
+
+        <a href="#register" class="hidden sm:inline-flex btn-ghost text-paper/80 hover:text-paper">
           Register
         </a>
       </div>

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Splash from '../components/Splash.astro';
 
 interface Props {
   title?: string;
@@ -39,6 +40,8 @@ const {
     <title>{title}</title>
   </head>
   <body>
+    <Splash />
+
     <main class="stack">
       <slot />
     </main>
