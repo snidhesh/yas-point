@@ -318,7 +318,14 @@ const unitTypes = ['Studio', '1 Bedroom', '2 Bedroom', '3 Bedroom', 'Not sure ye
         showThankYou(payload);
         return;
       }
-      throw new Error(`HTTP ${res.status}`);
+      /* Surface the server's specific error message so debugging 4xx/5xx is
+         possible from the browser console alone (no need to open Vercel logs). */
+      let serverMsg = `HTTP ${res.status}`;
+      try {
+        const j = await res.json();
+        if (j?.error) serverMsg += ` — ${j.error}`;
+      } catch { /* body wasn't JSON, fine */ }
+      throw new Error(serverMsg);
     } catch (err) {
       console.error('[register] submit failed', err);
       errorEl?.classList.remove('hidden');
